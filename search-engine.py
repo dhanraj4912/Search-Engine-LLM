@@ -46,8 +46,8 @@ if prompt := st.chat_input("Ask something..."):
 
     # Groq LLM
     llm = ChatGroq(
-        model_name="llama3-8b-8192",  
-        temperature=0
+        model_name="openai/gpt-oss-120b",  
+        temperature=0.7
     )
 
     tools = [search, wiki, arxiv]
