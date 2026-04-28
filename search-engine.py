@@ -46,7 +46,7 @@ if prompt := st.chat_input("Ask something..."):
 
     # Groq LLM
     llm = ChatGroq(
-        model_name="llama3-70b-8192",  # or "mixtral-8x7b-32768"
+        model_name="llama3-8b-8192",  
         temperature=0
     )
 
