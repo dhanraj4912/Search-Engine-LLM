@@ -13,3 +13,4 @@ arxiv
 wikipedia
 duckduckgo-search
 ddgs
+langchain-groq
