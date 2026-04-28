@@ -1,0 +1,62 @@
+import streamlit as st
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_agent
+from langchain_community.tools import ArxivQueryRun, WikipediaQueryRun, DuckDuckGoSearchRun
+from langchain_community.utilities import ArxivAPIWrapper, WikipediaAPIWrapper
+from langchain_community.callbacks.streamlit import StreamlitCallbackHandler
+from dotenv import load_dotenv
+load_dotenv()
+
+api_wrapper_wiki = WikipediaAPIWrapper(top_k_results=1, doc_content_chars_max=250)
+wiki = WikipediaQueryRun(api_wrapper=api_wrapper_wiki)
+
+api_wrapper_arxiv = ArxivAPIWrapper(top_k_results=1, doc_content_chars_max=250)
+arxiv = ArxivQueryRun(api_wrapper=api_wrapper_arxiv)
+
+search = DuckDuckGoSearchRun()
+
+
+st.title("LangChain Search Agent")
+st.sidebar.title("Settings")
+api_key = st.sidebar.text_input("Enter your API Key", type="password")
+
+
+if "messages" not in st.session_state:
+    st.session_state["messages"] = [
+        {"role": "assistant", "content": "Search the web and contents"}
+    ]
+
+
+for msg in st.session_state['messages']:
+    st.chat_message(msg['role']).write(msg['content'])
+
+
+if prompt := st.chat_input("Ask something..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
+
+    if not api_key:
+        st.warning("Please enter API key")
+        st.stop()
+    
+    llm = ChatOpenAI(api_key=api_key)
+
+    tools = [search, wiki, arxiv]
+
+    agent = create_agent(
+        model=llm,
+        tools=tools
+    )
+
+    with st.chat_message("assistant"):
+        st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=True)
+
+        response = agent.invoke(
+            {"messages": st.session_state.messages},
+            callbacks=[st_cb]
+        )
+
+        output = response["messages"][-1].content
+
+        st.session_state.messages.append({"role": "assistant", "content": output})
+        st.write(output)

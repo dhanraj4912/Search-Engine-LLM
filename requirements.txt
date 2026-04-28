@@ -1,0 +1,15 @@
+langchain
+langchain_community
+python-dotenv
+pypdf
+bs4
+wikipedia
+langchain_openai
+langchain_text_splitters
+Chromadb
+faiss-cpu
+beautifulsoup4
+arxiv
+wikipedia
+duckduckgo-search
+ddgs
